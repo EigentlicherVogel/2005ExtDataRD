@@ -38,12 +38,9 @@ bool FHead = true;
 
 static Long64_t maxtreesize = 1024 * 1024 * 1024;
 
-static u_short BIT_DIGITs[16] =
-  { 0x0001, 0x0002, 0x0004, 0x0008,
-    0x0010, 0x0020, 0x0040, 0x0080,
-    0x0100, 0x0200, 0x0400, 0x0800,
-    0x1000, 0x2000, 0x4000, 0x8000
-  };
+typedef struct{
+	u_short channels[16];
+} vsn_data;
     
 u_short dump[100];
 		
@@ -58,25 +55,34 @@ int main(){
 	TTree *T = new TTree("T", "Ex Data Test Tree");
 	T->SetMaxTreeSize(maxtreesize);
 	
-	u_short ext_d[VSN_CHANNEL_COUNT][16];
+	vsn_data Ext_Ds[VSN_CHANNEL_COUNT];
 	
 	for(int i = 0;i < VSN_CHANNEL_COUNT;i++){
-		for(int j = 0;j < 16;j++){
-			std::string chanL = "ext_d[" + std::to_string(i+1) + "][" + std::to_string(j+1)+ "]";
-			char * cstrC = new char [chanL.length()+1];
-  			std::strcpy (cstrC, chanL.c_str());
-  		/*
+		/*for(int j = 0;j < 16;j++){
+
+  		
 			std::string nameL = "ext_d[" + std::to_string(i+1) + "][" + std::to_string(j+1)+ "]/s";
 			char * cstrN = new char [nameL.length()+1];
   			std::strcpy (cstrN, nameL.c_str());*/
   		
   			//Convert both strings to cstrs, understandable by Branch
   		
-			T->Branch(cstrC, &ext_d[i][j] /*, cstrN */ );
+			/*T->Branch(cstrC, &ext_d[i][j] , cstrN  );
 			
 			//delete[] cstrC;
 			//delete[] cstrN;
-		}
+			
+			
+			
+		}*/
+			std::string chanL = "Ext_Ds[" + std::to_string(i+1) + "]";
+			char * cstrC = new char [chanL.length()+1];
+  			std::strcpy (cstrC, chanL.c_str());
+  			
+  			T->Branch(cstrC, &Ext_Ds[i]);
+			
+			delete[] cstrC;
+		
 	}
 	//Make the tree.
 	//Both of these starts from 1 because the VSN serial numbers starts from 1 and there is no VSN channel 0.
@@ -85,7 +91,7 @@ int main(){
 
 	FILE *cur_dat;
 	FILE *output;
-	cur_dat = fopen("file1.dat","rb");
+	cur_dat = fopen("file1 (3).dat","rb");
 	size_t size = 0;
 	output = fopen("Data-Cal","w");
 	if(THead){
@@ -113,7 +119,7 @@ int main(){
 	size = fread(&pFH,1,90,cur_dat);
 		if(size != 90)
 		{
-			return -1;
+			return -1;     
 		}
 		if(iSwap)
 		{
@@ -242,18 +248,18 @@ int main(){
 					u_short chan_data = (ga_inv[j] & 0x0fff);
 					//Read two parts of every single data word
 					if(cur_vsn < 8){
-						std::cout << "VSN: " << cur_vsn << std::endl;
-						std::cout << "Flag: " << chan_flag << std::endl;
-						std::cout << "Energy: " << chan_data << std::endl;
-						ext_d[cur_vsn-1][chan_flag] = chan_data;
+						//std::cout << "VSN: " << cur_vsn << std::endl;
+						//std::cout << "Flag: " << chan_flag << std::endl;
+						//std::cout << "Energy: " << chan_data << std::endl;
+						Ext_Ds[cur_vsn-1].channel[chan_flag] = chan_data;
 						chan_loc -= 1;
 						
 					//std::cout << "Reading channel " << chan_loc << " of vsn " << cur_vsn - 1 << std::endl;
 					}else{
-						std::cout << "VSN: " << cur_vsn-1 << std::endl;
-						std::cout << "Flag: " << chan_flag << std::endl;
-						std::cout << "Energy: " << chan_data << std::endl;
-						ext_d[cur_vsn-2][chan_flag] = chan_data;
+						//std::cout << "VSN: " << cur_vsn-1 << std::endl;
+						//std::cout << "Flag: " << chan_flag << std::endl;
+						//std::cout << "Energy: " << chan_data << std::endl;
+						Ext_Ds[cur_vsn-2].channel[chan_flag] = chan_data;
 						chan_loc -= 1;
 					//std::cout << "Reading channel " << chan_loc << " of vsn " << cur_vsn - 2 << std::endl;
 					}
@@ -268,7 +274,7 @@ int main(){
 			}
 			
 			T->Fill();
-			return 0;
+			//return 0;
 			
 			next_char = getc(cur_dat);
 			

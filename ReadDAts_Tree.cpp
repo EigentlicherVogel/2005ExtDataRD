@@ -38,9 +38,9 @@ bool FHead = true;
 
 static Long64_t maxtreesize = 1024 * 1024 * 1024;
 
-/* typedef struct{
+typedef struct{
 	u_short channels[16];
-} vsn_data; */
+}vsn_data;
     
 u_short dump[100];
 		
@@ -79,9 +79,14 @@ int main(){
 			char * cstrC = new char [chanL.length()+1];
   			std::strcpy (cstrC, chanL.c_str());
   			
-  			T->Branch(cstrC, &ext_d[i]);
+  			std::string nameL = "ext_d[" + std::to_string(i+1) + "][16]/s";
+			char * cstrN = new char [nameL.length()+1];
+  			std::strcpy (cstrN, nameL.c_str());
+  			
+  			T->Branch(cstrC, &ext_d[i], cstrN);
 			
-			//delete[] cstrC;
+			delete[] cstrC;
+			delete[] cstrN;
 		
 		
 		
@@ -151,7 +156,7 @@ int main(){
 				fprintf(output,"%s %d %d %d %x"
 			, "\nBuffer Info:" ,pBH.RecordType, pBH.RecordLength, pBH.DataLength, pBH.ModeFlags);
 				rot_count += 22;
-				std::cout << "File Pointer At " << ftell(cur_dat) << std::endl;
+				//std::cout << "File Pointer At " << ftell(cur_dat) << std::endl;
 			
 			
 			if(pBH.RecordLength != 16384){
@@ -259,7 +264,7 @@ int main(){
 					//std::cout << "Reading channel " << chan_loc << " of vsn " << cur_vsn - 1 << std::endl;
 					}else{
 						//std::cout << "VSN: " << cur_vsn-1 << std::endl;
-						//std::cout << "Flag: " << chan_flag << std::endl;
+						//std::cout << "Flag: " << chan_flag << std::wwseswedswendl;
 						//std::cout << "Energy: " << chan_data << std::endl;
 						ext_d[cur_vsn-2][chan_flag] = chan_data;
 						chan_loc -= 1;

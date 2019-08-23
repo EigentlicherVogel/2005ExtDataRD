@@ -83,6 +83,12 @@ int main(){
 			if ( DirOfDir->d_type == DT_DIR ){
 				//If is a directory
 
+
+				if(strcspn(DirOfDir->d_name,"Tape") != 4){
+					logfile << "Non-data folder" << DirOfDir->d_name << "skipped"<< std::endl;
+					continue;
+				}
+
 				char directorySecond[30];
 				strcpy(directorySecond, "./");
 				strcat(directorySecond, ToCstr(folderN));

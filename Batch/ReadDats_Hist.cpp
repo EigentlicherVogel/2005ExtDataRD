@@ -54,8 +54,12 @@ u_short ga_inv[300];
 int main(){
 
 	std::string folderN;
-	cout << "Please enter the folder name: ";
+	cout << "Please enter the folder name for input: ";
 	cin >> folderN;
+
+	std::string folderO;
+	cout << "Please enter the folder name for output: ";
+	cin >> folderO;
 
 	FILE *cur_data;
 	size_t tapeN = 0;
@@ -84,8 +88,8 @@ int main(){
 				//If is a directory
 
 
-				if(strcspn(DirOfDir->d_name,"Tape") != 4){
-					logfile << "Non-data folder" << DirOfDir->d_name << "skipped"<< std::endl;
+				if(strspn(DirOfDir->d_name,"Tape") != 4){
+					logfile << "Non-data folder  << DirOfDir->d_name << " skipped"<< std::endl;
 					continue;
 				}
 
@@ -139,7 +143,7 @@ int main(){
 								THead = false;
 							}
 
-							std::string filN = "Tape" + std::to_string(tapeN) + "-" + DirOfFil->d_name + ".root";
+							std::string filN = "./" + folderO + "/Tape" + std::to_string(tapeN) + "-" + DirOfFil->d_name + ".root";
 							TFile* FI = TFile::Open(ToCstr(filN),"RECREATE");
 							//Creates TFile for histograms 
 

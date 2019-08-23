@@ -4,6 +4,7 @@
 #include <cstring>
 #include <string>
 #include <iostream>
+#include <fstream>
 #include <bitset>
 #include <dirent.h>
 
@@ -49,23 +50,23 @@ size_t total_buf_read = 0;
 
 u_short ga_inv[300];
 
-
+std::ofstream logfile;
 
 int main(){
 
 	std::string folderN;
-	cout << "Please enter the folder name for input: ";
-	cin >> folderN;
+	std::cout << "Please enter the folder name for input: ";
+	std::cin >> folderN;
 
-	std::string folderO;
-	cout << "Please enter the folder name for output: ";
-	cin >> folderO;
+	//int mdirk = mkdir("Histograms", 0777);
+	//if(!mdirk){
+	//	return -57;
+	//}
 
 	FILE *cur_data;
 	size_t tapeN = 0;
 	size_t fileN = 0;
 
-	ofstream logfile;
   	logfile.open ("dataLog.txt");
     
 	DIR *LDire1; 
@@ -89,7 +90,7 @@ int main(){
 
 
 				if(strspn(DirOfDir->d_name,"Tape") != 4){
-					logfile << "Non-data folder  << DirOfDir->d_name << " skipped"<< std::endl;
+					logfile << "Non-data folder  " << DirOfDir->d_name << " skipped"<< std::endl;
 					continue;
 				}
 
@@ -143,8 +144,14 @@ int main(){
 								THead = false;
 							}
 
-							std::string filN = "./" + folderO + "/Tape" + std::to_string(tapeN) + "-" + DirOfFil->d_name + ".root";
-							TFile* FI = TFile::Open(ToCstr(filN),"RECREATE");
+							char itsName[60];
+							strcpy(itsName, DirOfDir->d_name);
+							strcat(itsName, "-");
+							strcat(itsName, DirOfFil->d_name);
+							strcat(itsName, ".root");
+							std::cout << "Data Saved Within " << itsName << std::endl;
+
+							TFile* FI = TFile::Open(itsName,"RECREATE");
 							//Creates TFile for histograms 
 
 							int a = readData(cur_data, FI);
@@ -259,7 +266,9 @@ int readData(FILE* cur_dat, TFile* FIL){
 				rot_count += gamma_ct * 8;
 			
 
-				fread(ga_inv, 2 , ex_count , cur_dat);
+				if (fread(ga_inv, 2 , ex_count , cur_dat) == 0){
+					continue;
+				};
 			
 				for(int i = 0;i < ex_count;i++){
 					SwapBits((char*)&ga_inv[i],2);
